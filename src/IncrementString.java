@@ -1,34 +1,41 @@
-import javax.annotation.processing.SupportedSourceVersion;
+import java.util.regex.Pattern;
 
 public class IncrementString {
-
+    static final Pattern NUMBER = Pattern.compile("\\d+");
     public static String incrementString(String str) {
         StringBuilder numbers = new StringBuilder();
         StringBuilder text = new StringBuilder();
+        long number;
 
-        for(int i = 0; i < str.length(); i++) {
-
-            if(Character.isDigit(str.toCharArray()[i])){
-
-                if(!numbers.toString().equals("") && Integer.parseInt(String.valueOf(str.toCharArray()[i])) ==0) {
-                 text.append(str.toCharArray()[i]);
-                } else {
-                    numbers.append(str.toCharArray()[i]);
-                }
-            } else {
-                text.append(str.toCharArray()[i]);
+        for(int i = str.length() -1; i >= 0; i--) {
+            if(!Character.isDigit(str.toCharArray()[i])) {
+                text.append(str.substring(0,(i+1)));
+                break;
+            }
+            int var = Integer.parseInt(String.valueOf(str.toCharArray()[i]));
+            numbers.append(var);
+            if(var < 9) {
+                int calc = Integer.parseInt(String.valueOf(numbers));
+                numbers = new StringBuilder(""+calc);
+                text.append(str.substring(0,(i)));
+                break;
             }
         }
 
-       return String.format(text+"%0" + numbers.length() + "d",
-                Integer.parseInt(String.valueOf(numbers)) + 1);
+        if(numbers.length() < 1){
+            numbers.append(0);
+        }
+
+        return text+""+NUMBER.matcher(numbers.reverse())
+                .replaceFirst(s -> String.format(
+                        "%0" + s.group().length() + "d",
+                        Long.parseLong(s.group()) + 1));
     }
 
+
     public static void main(String[] args) {
-        System.out.println(incrementString("foobar000"));
-        System.out.println(incrementString("foobar001"));
-        System.out.println(incrementString("foobar99"));
         System.out.println(incrementString("foobar099"));
+
 
     }
 }
